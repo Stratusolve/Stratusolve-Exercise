@@ -29,18 +29,18 @@
                 <form action="update_task.php" method="post">
                     <div class="row">
                         <div class="col-md-12" style="margin-bottom: 5px;;">
-                            <input id="InputTaskName" name="InputTaskName" type="text" placeholder="Task Name" class="form-control">
+                            <input id="InputTaskName" type="text" placeholder="Task Name" class="form-control">
                         </div>
                         <div class="col-md-12">
-                            <textarea id="InputTaskDescription" name="InputTaskDescription" placeholder="Description" class="form-control"></textarea>
+                            <textarea id="InputTaskDescription" placeholder="Description" class="form-control"></textarea>
                         </div>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <button id="deleteTask"  type="button" class="btn btn-danger">Delete Task</button>
-                <button id="saveTask" " type="button" class="btn btn-primary">Save changes</button>
+                <button id="deleteTask" type="button" class="btn btn-danger">Delete Task</button>
+                <button id="saveTask" type="button" class="btn btn-primary">Save changes</button>
             </div>
         </div>
     </div>
@@ -95,32 +95,14 @@
             console.log('Task ID: '+triggerElement.attr("id"));
         }
     });
-    $(function(){
     $('#saveTask').click(function() {
-                var TaskToSave = $(this).attr("id");
-        //Perform the ajax post
-        $.post("update_task.php",{$("#InputTaskDescription")},
-               function(data){
-                $("#InputTaskDescription").text(data);
-                });
-        $.post("update_task.php",{$("#InputTaskName")},
-               function(data){
-                $("#InputTaskName").text(data);
-                });
-        alert('Saved');
-        });
+        //Assignment: Implement this functionality
+        alert('You clicked save! Now implement this functionality.');
         $('#myModal').modal('hide');
     });
-    $(function(){
     $('#deleteTask').click(function() {
-        //Get id from the link
-        //Perform the ajax post
-        $.post("update_task.php",{$("#InputTaskName")},
-               function(data){
-                $("#TaskList").text(data);
-                });
-        alert('Task successfully deleted');
-        });
+        //Assignment: Implement this functionality
+        alert('You clicked delete! Now implement this functionality.');
         $('#myModal').modal('hide');
     });
 </script>
