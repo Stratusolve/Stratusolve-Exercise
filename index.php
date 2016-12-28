@@ -29,18 +29,18 @@
                 <form action="update_task.php" method="post">
                     <div class="row">
                         <div class="col-md-12" style="margin-bottom: 5px;;">
-                            <input id="InputTaskName" name="InputTaskName" type="text" placeholder="Task Name" class="form-control">
+                            <input id="InputTaskName" type="text" placeholder="Task Name" class="form-control" name="TaskName">
                         </div>
                         <div class="col-md-12">
-                            <textarea id="InputTaskDescription" name="InputTaskDescription" placeholder="Description" class="form-control"></textarea>
+                            <textarea id="InputTaskDescription" placeholder="Description" class="form-control" name="TaskDescription"></textarea>
                         </div>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <button id="deleteTask"  type="button" class="btn btn-danger">Delete Task</button>
-                <button id="saveTask" " type="button" class="btn btn-primary">Save changes</button>
+                <button id="deleteTask" type="button" class="btn btn-danger">Delete Task</button>
+                <button id="saveTask" type="button" class="btn btn-primary">Save changes</button>
             </div>
         </div>
     </div>
@@ -60,18 +60,6 @@
             </button>
             <div id="TaskList" class="list-group">
                 <!-- Assignment: These are simply dummy tasks to show how it should look and work. You need to dynamically update this list with actual tasks -->
-                <a id="1" href="#" class="list-group-item" data-toggle="modal" data-target="#myModal">
-                    <h4 class="list-group-item-heading">Task Name</h4>
-                    <p class="list-group-item-text">Task Description</p>
-                </a>
-                <a id="2" href="#" class="list-group-item" data-toggle="modal" data-target="#myModal">
-                    <h4 class="list-group-item-heading">Task Name</h4>
-                    <p class="list-group-item-text">Task Description</p>
-                </a>
-                <a id="3" href="#" class="list-group-item" data-toggle="modal" data-target="#myModal">
-                    <h4 class="list-group-item-heading">Task Name</h4>
-                    <p class="list-group-item-text">Task Description</p>
-                </a>
             </div>
         </div>
         <div class="col-md-3">
@@ -83,45 +71,53 @@
 <script type="text/javascript" src="assets/js/jquery-1.12.3.min.js"></script>
 <script type="text/javascript" src="assets/js/bootstrap.min.js"></script>
 <script type="text/javascript">
+    $(document).ready(function(){
+    var currentTaskId = -1;
     $('#myModal').on('show.bs.modal', function (event) {
         var triggerElement = $(event.relatedTarget); // Element that triggered the modal
         var modal = $(this);
         if (triggerElement.attr("id") == 'newTask') {
             modal.find('.modal-title').text('New Task');
             $('#deleteTask').hide();
+            currentTaskId = -1;
         } else {
             modal.find('.modal-title').text('Task details');
             $('#deleteTask').show();
+            currentTaskId = triggerElement.attr("id");
             console.log('Task ID: '+triggerElement.attr("id"));
         }
     });
-    $(function(){
-    $('#saveTask').click(function() {
-                var TaskToSave = $(this).attr("id");
-        //Perform the ajax post
-        $.post("update_task.php",{$("#InputTaskDescription")},
-               function(data){
-                $("#InputTaskDescription").text(data);
-                });
-        $.post("update_task.php",{$("#InputTaskName")},
-               function(data){
-                $("#InputTaskName").text(data);
-                });
-        alert('Saved');
-        });
-        $('#myModal').modal('hide');
+    $('#saveTask').click(function(e) {
+        //Assignment: Implement this functionality
+        $("#myInp").remove();
+        //Append the hidden input element to target specific functions on server side
+        $("form").append("<input type='hidden' name='mysave' value='savetask' id='myInp'></input>");
+        var fields =  $("form").serializeArray();
+        $.post("update_task.php",fields,function(json_data){
+             alert('Save '+json_data+' Id:'+currentTaskId);
+             $('#myModal').modal('hide');
+             updateTaskList();  
+            });
+        e.preventDefault();
     });
-    $(function(){
     $('#deleteTask').click(function() {
-        //Get id from the link
-        //Perform the ajax post
-        $.post("update_task.php",{$("#InputTaskName")},
-               function(data){
-                $("#TaskList").text(data);
-                });
-        alert('Task successfully deleted');
+        //Assignment: Implement this functionality
+        $("#myInp").remove();
+        //Append the hidden input element to target specific functions on server side
+        $("form").append("<input name = 'mydelete' type='hidden' value='deletetask' id='myInp'></input>");
+        var fields =  $("form").serializeArray();
+        $.post("update_task.php",fields,function(json_data){
+             alert('Delete... '+json_data+'  Id:'+currentTaskId);
+             $('#myModal').modal('hide');
+             updateTaskList();  
+            });
+    });
+    function updateTaskList() {
+        $.post("list_tasks.php", function( data ) {
+            $( "#TaskList" ).html( data );
         });
-        $('#myModal').modal('hide');
+    }
+    updateTaskList();
     });
 </script>
 </html>
