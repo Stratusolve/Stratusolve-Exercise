@@ -86,23 +86,72 @@
             console.log('Task ID: '+triggerElement.attr("id"));
         }
     });
+
     $('#saveTask').click(function() {
         //Assignment: Implement this functionality
-        alert('Save... Id:'+currentTaskId);
-        $('#myModal').modal('hide');
-        updateTaskList();
+        //alert('Save... Id:'+currentTaskId);
+
+        var taskName = $("#InputTaskName").val();
+        var taskDescription = $("#InputTaskDescription").val();
+
+        var data = {task_id:currentTaskId, task_name:taskName, task_description:taskDescription, action:'save'};
+
+
+        $.post('update_task.php', data, function (feedback) {
+            var message = feedback.message;
+            var messageClass = 'alert alert-danger';
+            if (feedback.success) {
+                messageClass = 'alert alert-success';
+                updateTaskList();
+            }
+
+            var messageBox = $('<div id="feedback-message" class="' + messageClass + '">' + message + '</div>');
+
+            $(".modal-body form").prepend(messageBox);
+            setTimeout(function() {
+                $("#feedback-message").remove();
+                $("#InputTaskName").val('');
+                $("#InputTaskDescription").val('');
+                $('#myModal').modal('hide');
+            }, 3000);
+
+        }, 'json');
+
     });
+
     $('#deleteTask').click(function() {
         //Assignment: Implement this functionality
-        alert('Delete... Id:'+currentTaskId);
-        $('#myModal').modal('hide');
-        updateTaskList();
+        //alert('Delete... Id:'+currentTaskId);
+
+        var data = {task_id:currentTaskId, action:'delete'};
+
+        $.post('update_task.php', data, function (feedback) {
+
+            var message = feedback.message;
+            var messageClass = 'alert alert-danger';
+            if (feedback.success) {
+                messageClass = 'alert alert-success';
+                updateTaskList();
+            }
+
+            var messageBox = $('<div id="feedback-message" class="' + messageClass + '">' + message + '</div>');
+
+            $(".modal-body form").prepend(messageBox);
+            setTimeout(function() {
+                $("#feedback-message").remove();
+                $('#myModal').modal('hide');
+            }, 3000);
+
+        }, 'json');
+
     });
+
     function updateTaskList() {
         $.post("list_tasks.php", function( data ) {
             $( "#TaskList" ).html( data );
         });
     }
+
     updateTaskList();
 </script>
 </html>

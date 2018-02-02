@@ -4,4 +4,22 @@
  */
 require('Task.class.php');
 // Assignment: Implement this script
+
+if (isset($_POST) ) {
+    $action = filter_input(INPUT_POST, 'action', FILTER_SANITIZE_STRING);
+    $taskId = filter_input(INPUT_POST, 'task_id', FILTER_SANITIZE_NUMBER_INT);
+
+    $taskClass = new Task($taskId);
+
+    if ($action == 'save') {
+        $taskClass->Save();
+    }
+
+    if ($action == 'delete') {
+        $taskClass->Delete();
+    }
+}
+
+echo json_encode(['message' => 'You either tried accessing this directly or submitted an invalid action. Please trying saving the form again', 'success'=>false]);
+exit;
 ?>
