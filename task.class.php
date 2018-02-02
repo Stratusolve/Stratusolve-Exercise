@@ -38,7 +38,7 @@ class Task {
             }
             return ++$highest;
         }
-        return -1; // Placeholder return for now
+        return 1; // Placeholder return for now
     }
 
     protected function LoadFromId($Id = null) {
