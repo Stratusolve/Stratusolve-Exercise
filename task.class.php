@@ -27,8 +27,12 @@ class Task {
         $this->TaskDescription = 'New Description';
     }
     protected function getUniqueId() {
+
         // Assignment: Code to get new unique ID
-        return -1; // Placeholder return for now
+        $taskList = $this->getTaskList();
+        $taskListIds = array_column( $taskList, 'TaskId' );
+        $uniqueId = $taskListIds[ count( $taskListIds ) - 1 ] + 1;
+        return $uniqueId;
     }
     protected function LoadFromId($Id = null) {
         if ($Id) {
@@ -37,11 +41,50 @@ class Task {
             return null;
     }
 
-    public function Save() {
+    public function Save( $task, $description, $id = -1 ) {
+
         //Assignment: Code to save task here
+        $taskList = $this->getTaskList();
+
+        if ( $id == -1 )
+        {
+            $newTask = [
+                "TaskId"=> $this->getUniqueId(),
+                "TaskName" => $task,
+                "TaskDescription" => $description
+            ];
+            array_push( $taskList, $newTask );
+        }
+        else
+        {
+            $taskListIds = array_column( $taskList, 'TaskId' );
+            $search = array_search( $id, $taskListIds );
+            $taskList[ $search ] = [
+                "TaskId"=> $id,
+                "TaskName" => $task,
+                "TaskDescription" => $description
+            ];
+        }
+
+        $newTaskList = json_encode( array_values( $taskList ) );
+
+        file_put_contents( 'Task_Data.txt', $newTaskList );
     }
-    public function Delete() {
+    public function Delete( $id ) {
+
         //Assignment: Code to delete task here
+        $taskList = $this->getTaskList();
+        $taskListIds = array_column( $taskList, 'TaskId' );
+        $search = array_search( $id, $taskListIds );
+        unset( $taskList[ $search ] );
+        $newTaskList = json_encode( array_values( $taskList ) );
+        file_put_contents( 'Task_Data.txt', $newTaskList );
+    }
+
+    // private function get task list
+    private function getTaskList() {
+        $taskList = file_get_contents('Task_Data.txt');
+        return json_decode( $taskList, true );
     }
 }
 ?>

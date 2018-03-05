@@ -79,24 +79,34 @@
             modal.find('.modal-title').text('New Task');
             $('#deleteTask').hide();
             currentTaskId = -1;
+            $( '#InputTaskName' ).val( '' );
+	        $( '#InputTaskDescription' ).val( '' );
         } else {
             modal.find('.modal-title').text('Task details');
             $('#deleteTask').show();
             currentTaskId = triggerElement.attr("id");
             console.log('Task ID: '+triggerElement.attr("id"));
+	        $( '#InputTaskName' ).val( triggerElement.find( '.list-group-item-heading' ).text() );
+	        $( '#InputTaskDescription' ).val( triggerElement.find( '.list-group-item-text' ).text() );
         }
     });
     $('#saveTask').click(function() {
         //Assignment: Implement this functionality
-        alert('Save... Id:'+currentTaskId);
-        $('#myModal').modal('hide');
-        updateTaskList();
+        var taskName = $( '#InputTaskName' ).val();
+	    var taskDescription = $( '#InputTaskDescription' ).val();
+	    var data = { action: "save", name: taskName, description: taskDescription, taskId: currentTaskId };
+        $.post( "update_task.php", data , function( ) {
+        	$('#myModal').modal('hide');
+	        updateTaskList();
+        } );
     });
     $('#deleteTask').click(function() {
         //Assignment: Implement this functionality
-        alert('Delete... Id:'+currentTaskId);
-        $('#myModal').modal('hide');
-        updateTaskList();
+	    var data = { action: "delete", taskId: currentTaskId };
+	    $.post( "update_task.php", data , function( ) {
+		    $('#myModal').modal('hide');
+		    updateTaskList();
+	    } );
     });
     function updateTaskList() {
         $.post("list_tasks.php", function( data ) {
