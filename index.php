@@ -78,8 +78,7 @@
         if (triggerElement.attr("id") == 'newTask') {
             modal.find('.modal-title').text('New Task');
             $('#deleteTask').hide();
-            $("#InputTaskName").val('');
-            $("#InputTaskDescription").val('');
+            setFieldValues();
             currentTaskId = -1;
         } else {
             modal.find('.modal-title').text('Task details');
@@ -88,12 +87,43 @@
             var taskNameElement = triggerElement.find('h4');
             var taskDescriptionElement = triggerElement.find('p');
 
-            $("#InputTaskName").val($(taskNameElement).text());
-            $("#InputTaskDescription").val($(taskDescriptionElement).text());
+            setFieldValues($(taskNameElement).text(), $(taskDescriptionElement).text());
 
             console.log('Task ID: '+triggerElement.attr("id"));
         }
     });
+
+    var setFieldValues = function(taskName, taskDescription) {
+        if (taskName === undefined) {
+            taskName = "";
+        }
+        if (taskDescription === undefined) {
+            taskDescription = "";
+        }
+        $("#InputTaskName").val(taskName);
+        $("#InputTaskDescription").val(taskDescription);
+    };
+
+    var handleSubmission = function(path, data) {
+        $.post(path, data, function (feedback) {
+            var message = feedback.message;
+            var messageClass = 'alert alert-danger';
+            if (feedback.success) {
+                messageClass = 'alert alert-success';
+                updateTaskList();
+            }
+
+            var messageBox = $('<div id="feedback-message" class="' + messageClass + '">' + message + '</div>');
+
+            $(".modal-body form").prepend(messageBox);
+            setTimeout(function() {
+                $("#feedback-message").remove();
+                setFieldValues();
+                $('#myModal').modal('hide');
+            }, 3000);
+
+        }, 'json');
+    };
 
     $('#saveTask').click(function() {
         //Assignment: Implement this functionality
@@ -103,27 +133,7 @@
         var taskDescription = $("#InputTaskDescription").val();
 
         var data = {task_id:currentTaskId, task_name:taskName, task_description:taskDescription, action:'save'};
-
-        $.post('update_task.php', data, function (feedback) {
-            var message = feedback.message;
-            var messageClass = 'alert alert-danger';
-            if (feedback.success) {
-                messageClass = 'alert alert-success';
-                updateTaskList();
-            }
-
-            var messageBox = $('<div id="feedback-message" class="' + messageClass + '">' + message + '</div>');
-
-            $(".modal-body form").prepend(messageBox);
-            setTimeout(function() {
-                $("#feedback-message").remove();
-                $("#InputTaskName").val('');
-                $("#InputTaskDescription").val('');
-                $('#myModal').modal('hide');
-            }, 3000);
-
-        }, 'json');
-
+        handleSubmission('update_task.php', data)
     });
 
     $('#deleteTask').click(function() {
@@ -131,26 +141,7 @@
         //alert('Delete... Id:'+currentTaskId);
 
         var data = {task_id:currentTaskId, action:'delete'};
-
-        $.post('update_task.php', data, function (feedback) {
-
-            var message = feedback.message;
-            var messageClass = 'alert alert-danger';
-            if (feedback.success) {
-                messageClass = 'alert alert-success';
-                updateTaskList();
-            }
-
-            var messageBox = $('<div id="feedback-message" class="' + messageClass + '">' + message + '</div>');
-
-            $(".modal-body form").prepend(messageBox);
-            setTimeout(function() {
-                $("#feedback-message").remove();
-                $('#myModal').modal('hide');
-            }, 3000);
-
-        }, 'json');
-
+        handleSubmission('update_task.php', data);
     });
 
     function updateTaskList() {
