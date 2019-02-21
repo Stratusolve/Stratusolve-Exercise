@@ -1,4 +1,5 @@
 <?php
+header('Content-type:application/json;charset=utf-8');
 /**
  * This script is to be used to receive a POST with the object information and then either updates, creates or deletes the task object
  */
@@ -44,4 +45,3 @@ if (isset($_POST)) {
 
 echo json_encode(['message' => $message, 'success' => $success]);
 exit;
-?>
