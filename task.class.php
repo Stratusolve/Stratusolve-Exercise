@@ -24,9 +24,9 @@ class Task {
     protected function Create() {
         // This function needs to generate a new unique ID for the task
         // Assignment: Generate unique id for the new task
-        $this->TaskId = $this->getUniqueId();
-        $this->TaskName = 'New Task';
-        $this->TaskDescription = 'New Description';
+        $this->setTaskId($this->getUniqueId());
+        $this->setTaskName('New Task');
+        $this->setDescription('New Description');
     }
 
     protected function getUniqueId() {
@@ -46,9 +46,9 @@ class Task {
         if ($Id && !empty($this->TaskDataSource)) {
             foreach($this->TaskDataSource as $dataSource) {
                 if ($Id == $dataSource['TaskId']) {
-                    $this->TaskId = $dataSource['TaskId'];
-                    $this->TaskName = $dataSource['TaskName'];
-                    $this->TaskDescription = $dataSource['TaskDescription'];
+                    $this->setTaskId($dataSource['TaskId']);
+                    $this->setTaskName($dataSource['TaskName']);
+                    $this->setDescription($dataSource['TaskDescription']);
 
                     return true;
                 }
@@ -60,53 +60,67 @@ class Task {
 
     public function Save() {
         //Assignment: Code to save task here
-        $feedback = ['message' => 'No post data found', 'success' => false];
-        if (isset($_POST)) {
+        $key = $this->findArrayKey();
+        if ($key === -1) {
+            $currentMaxKey = max(array_keys($this->TaskDataSource));
+            $key = $currentMaxKey == 0 ?: $currentMaxKey + 1;
+        }
+        $this->TaskDataSource[$key]  = [
+            'TaskId'=>$this->getTaskId(),
+            'TaskName' =>$this->getTaskName(),
+            'TaskDescription' => $this->getDescription(),
+        ];
 
-            $this->TaskId = filter_input(INPUT_POST, 'task_id', FILTER_SANITIZE_NUMBER_INT);
-            $this->TaskName = filter_input(INPUT_POST, 'task_name', FILTER_SANITIZE_STRING);
-            $this->TaskDescription = filter_input(INPUT_POST, 'task_description', FILTER_SANITIZE_STRING);
-            $isUpdated = false;
+        file_put_contents('Task_Data.txt', json_encode($this->TaskDataSource));
+    }
 
-            if ($this->TaskId > 0 && !empty($this->TaskDataSource)) {
-                foreach ($this->TaskDataSource as $key=>$dataSource) {
-                    if ($this->TaskId == $dataSource['TaskId']) {
-                        $this->TaskDataSource[$key] = ['TaskId'=>$this->TaskId, 'TaskName' =>$this->TaskName, 'TaskDescription' => $this->TaskDescription];
-                        $isUpdated = true;
-                        $feedback = ['message' => 'Task successfully updated', 'success' => true];
-                        break;
-                    }
+    public function setTaskId($taskId) {
+        $this->TaskId = $taskId;
+    }
+
+    public function setTaskName($taskName) {
+        $this->TaskName = $taskName;
+    }
+
+    public function setDescription($description) {
+        $this->TaskDescription = $description;
+    }
+
+    public function getTaskId() {
+        return $this->TaskId;
+    }
+
+    public function getTaskName() {
+        return $this->TaskName;
+    }
+
+    public function getDescription() {
+        return $this->TaskDescription;
+    }
+
+    public function findArrayKey() {
+        $taskKey = -1;
+        if (!is_null($this->TaskId) && $this->TaskId > -1) {
+            foreach ($this->TaskDataSource as $key=>$dataSource) {
+                if ($this->TaskId == $dataSource['TaskId']) {
+                    $taskKey = $key;
+                    break;
                 }
             }
-
-            if (!$isUpdated) {
-                $this->TaskId = $this->getUniqueId();
-                $this->TaskDataSource[] = ['TaskId'=>$this->TaskId, 'TaskName' =>$this->TaskName, 'TaskDescription' => $this->TaskDescription];
-                $feedback = ['message' => 'Task successfully added', 'success' => true];
-            }
-
-            file_put_contents('Task_Data.txt', json_encode($this->TaskDataSource));
         }
-        echo json_encode($feedback);
-        exit();
+        return (int)$taskKey;
     }
 
     public function Delete() {
         //Assignment: Code to delete task here
-        $feedback = ['message' => 'Task not found', 'success' => false, 'task Id'=>$this->TaskId];
-        if (!is_null($this->TaskId) && $this->TaskId > 0) {
-            foreach ($this->TaskDataSource as $key=>$dataSource) {
-                if ($this->TaskId == $dataSource['TaskId']) {
-                    unset($this->TaskDataSource[$key]);
-                    file_put_contents('Task_Data.txt', json_encode($this->TaskDataSource));
-                    $feedback = ['message' => 'Task successfully deleted', 'success' => true];
-                }
-            }
+        $deleted = false;
+        $key = $this->findArrayKey();
+        if ($key > -1) {
+            unset($this->TaskDataSource[$key]);
+            file_put_contents('Task_Data.txt', json_encode($this->TaskDataSource));
+            $deleted = true;
         }
-
-        echo json_encode($feedback);
-        exit;
-
+        return $deleted;
     }
 }
 ?>

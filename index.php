@@ -78,11 +78,19 @@
         if (triggerElement.attr("id") == 'newTask') {
             modal.find('.modal-title').text('New Task');
             $('#deleteTask').hide();
+            $("#InputTaskName").val('');
+            $("#InputTaskDescription").val('');
             currentTaskId = -1;
         } else {
             modal.find('.modal-title').text('Task details');
             $('#deleteTask').show();
             currentTaskId = triggerElement.attr("id");
+            var taskNameElement = triggerElement.find('h4');
+            var taskDescriptionElement = triggerElement.find('p');
+
+            $("#InputTaskName").val($(taskNameElement).text());
+            $("#InputTaskDescription").val($(taskDescriptionElement).text());
+
             console.log('Task ID: '+triggerElement.attr("id"));
         }
     });
