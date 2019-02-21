@@ -60,11 +60,7 @@ class Task {
 
     public function Save() {
         //Assignment: Code to save task here
-        $key = $this->findArrayKey();
-        if ($key === -1) {
-            $currentMaxKey = max(array_keys($this->TaskDataSource));
-            $key = $currentMaxKey == 0 ?: $currentMaxKey + 1;
-        }
+        $key = $this->findArrayKey(true);
         $this->TaskDataSource[$key]  = [
             'TaskId'=>$this->getTaskId(),
             'TaskName' =>$this->getTaskName(),
@@ -98,7 +94,7 @@ class Task {
         return $this->TaskDescription;
     }
 
-    public function findArrayKey() {
+    public function findArrayKey($generateIfNotExists = false) {
         $taskKey = -1;
         if (!is_null($this->TaskId) && $this->TaskId > -1) {
             foreach ($this->TaskDataSource as $key=>$dataSource) {
@@ -108,7 +104,12 @@ class Task {
                 }
             }
         }
-        return (int)$taskKey;
+
+        if (-1 === $taskKey && $generateIfNotExists) {
+            $currentMaxKey = max(array_keys($this->TaskDataSource));
+            $taskKey = $currentMaxKey == 0 ?: $currentMaxKey + 1;
+        }
+        return $taskKey;
     }
 
     public function Delete() {

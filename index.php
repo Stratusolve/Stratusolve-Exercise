@@ -104,7 +104,6 @@
 
         var data = {task_id:currentTaskId, task_name:taskName, task_description:taskDescription, action:'save'};
 
-
         $.post('update_task.php', data, function (feedback) {
             var message = feedback.message;
             var messageClass = 'alert alert-danger';
